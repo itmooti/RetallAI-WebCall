@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Retell AI Chat Widget</title>
+
+  <!--
+    ╔══════════════════════════════════════════════════════════════╗
+    ║  RETELL WEBSITE WIDGET — EMBED VERSION                      ║
+    ║                                                              ║
+    ║  This is the simplest way to add Retell to any website.     ║
+    ║  Just update the data attributes below and drop this        ║
+    ║  <script> tag into any page's <head>.                       ║
+    ║                                                              ║
+    ║  Two modes available:                                        ║
+    ║  1. Chat Widget (default) — text-based AI chat              ║
+    ║  2. Callback Widget — collects info, triggers phone call    ║
+    ║                                                              ║
+    ║  Docs: https://docs.retellai.com/deploy/chat-widget         ║
+    ╚══════════════════════════════════════════════════════════════╝
+  -->
+
+  <!-- ═══════════════════════════════════════════════
+       OPTION 1: CHAT WIDGET (text-based conversation)
+       ═══════════════════════════════════════════════ -->
+  <!--
+  <script
+    id="retell-widget"
+    src="https://dashboard.retellai.com/retell-widget.js"
+    type="module"
+    data-public-key="YOUR_RETELL_PUBLIC_KEY"
+    data-agent-id="YOUR_CHAT_AGENT_ID"
+    data-agent-version="0"
+    data-title="Chat with us!"
+  ></script>
+  -->
+
+  <!-- ═══════════════════════════════════════════════
+       OPTION 2: CALLBACK WIDGET (triggers phone call)
+       ═══════════════════════════════════════════════ -->
+  <!--
+  <script
+    id="retell-widget"
+    src="https://dashboard.retellai.com/retell-widget.js"
+    type="module"
+    data-public-key="YOUR_RETELL_PUBLIC_KEY"
+    data-agent-id="YOUR_VOICE_AGENT_ID"
+    data-widget="callback"
+    data-phone-number="YOUR_RETELL_PHONE_NUMBER"
+    data-title="Request a Call"
+    data-countries="AU,US,GB"
+    data-color="#6c5ce7"
+  ></script>
+  -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #fafafa;
+      --surface: #ffffff;
+      --border: #e8e8ed;
+      --text: #1a1a2e;
+      --text-muted: #6b6b80;
+      --accent: #6c5ce7;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3rem;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .setup-section {
+      margin-bottom: 2rem;
+    }
+
+    .setup-section h2 {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .code-block {
+      background: #1a1a2e;
+      border-radius: 12px;
+      padding: 1.5rem;
+      overflow-x: auto;
+      position: relative;
+    }
+
+    .code-block pre {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.78rem;
+      line-height: 1.8;
+      color: #c4c4d8;
+      white-space: pre;
+      margin: 0;
+    }
+
+    .code-block .tag { color: #e17055; }
+    .code-block .attr { color: #a29bfe; }
+    .code-block .val { color: #00b894; }
+    .code-block .comment { color: #4a4a5e; font-style: italic; }
+
+    .copy-btn {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 6px;
+      color: #888;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      padding: 0.3rem 0.6rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.15); color: #ccc; }
+
+    .steps {
+      margin-top: 2rem;
+    }
+    .step {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .step-num {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+    .step-content h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    .step-content p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .step-content a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .step-content a:hover { text-decoration: underline; }
+    .step-content code {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.78rem;
+      background: #f0f0f5;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2rem 0;
+    }
+
+    .note {
+      background: #f5f3ff;
+      border: 1px solid #e4e0f7;
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      font-size: 0.82rem;
+      color: #5b4bd6;
+      line-height: 1.6;
+    }
+
+    .footer {
+      margin-top: 2rem;
+      font-size: 0.72rem;
+      color: #999;
+      font-family: 'Space Mono', monospace;
+    }
+    .footer a { color: var(--accent); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h1>Retell Widget Embed</h1>
+    <p class="subtitle">
+      The simplest way to add AI conversation to any website.
+      Just one <code>&lt;script&gt;</code> tag in your page's <code>&lt;head&gt;</code>.
+    </p>
+
+    <!-- CHAT WIDGET CODE -->
+    <div class="setup-section">
+      <h2>// Chat Widget Snippet</h2>
+      <div class="code-block" id="chatCode">
+        <button class="copy-btn" onclick="copyCode('chatCode')">Copy</button>
+        <pre><span class="tag">&lt;script</span>
+  <span class="attr">id</span>=<span class="val">"retell-widget"</span>
+  <span class="attr">src</span>=<span class="val">"https://dashboard.retellai.com/retell-widget.js"</span>
+  <span class="attr">type</span>=<span class="val">"module"</span>
+  <span class="attr">data-public-key</span>=<span class="val">"YOUR_RETELL_PUBLIC_KEY"</span>
+  <span class="attr">data-agent-id</span>=<span class="val">"YOUR_CHAT_AGENT_ID"</span>
+  <span class="attr">data-agent-version</span>=<span class="val">"0"</span>
+  <span class="attr">data-title</span>=<span class="val">"Chat with us!"</span>
+<span class="tag">&gt;&lt;/script&gt;</span></pre>
+      </div>
+    </div>
+
+    <!-- CALLBACK WIDGET CODE -->
+    <div class="setup-section">
+      <h2>// Callback Widget Snippet</h2>
+      <div class="code-block" id="callbackCode">
+        <button class="copy-btn" onclick="copyCode('callbackCode')">Copy</button>
+        <pre><span class="tag">&lt;script</span>
+  <span class="attr">id</span>=<span class="val">"retell-widget"</span>
+  <span class="attr">src</span>=<span class="val">"https://dashboard.retellai.com/retell-widget.js"</span>
+  <span class="attr">type</span>=<span class="val">"module"</span>
+  <span class="attr">data-public-key</span>=<span class="val">"YOUR_RETELL_PUBLIC_KEY"</span>
+  <span class="attr">data-agent-id</span>=<span class="val">"YOUR_VOICE_AGENT_ID"</span>
+  <span class="attr">data-widget</span>=<span class="val">"callback"</span>
+  <span class="attr">data-phone-number</span>=<span class="val">"+61XXXXXXXXX"</span>
+  <span class="attr">data-title</span>=<span class="val">"Request a Call"</span>
+  <span class="attr">data-countries</span>=<span class="val">"AU,US,GB"</span>
+  <span class="attr">data-color</span>=<span class="val">"#6c5ce7"</span>
+<span class="tag">&gt;&lt;/script&gt;</span></pre>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="steps">
+      <h2 style="font-family:'Space Mono',monospace;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--accent);margin-bottom:1.25rem;">// Setup Steps</h2>
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Create a Public Key</h3>
+          <p>In your <a href="https://dashboard.retellai.com" target="_blank">Retell Dashboard</a>, go to Keys → Add Key → select <strong>Public Key</strong>. Enter the domain where you'll embed the widget.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Get your Agent ID</h3>
+          <p>For chat widgets, use a <strong>Chat Agent ID</strong>. For callback widgets, use a <strong>Voice Agent ID</strong>. Find these in your agent settings.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>Replace the placeholders</h3>
+          <p>Swap <code>YOUR_RETELL_PUBLIC_KEY</code> and <code>YOUR_CHAT_AGENT_ID</code> (or voice agent ID) with your actual values.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h3>Drop it in</h3>
+          <p>Paste the script tag into the <code>&lt;head&gt;</code> of any HTML page. A floating button will appear automatically in the bottom-right corner.</p>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider" />
+
+    <div class="note">
+      <strong>Tip:</strong> The widget uses public keys (not your API secret), so it's safe to embed directly.
+      For optional reCAPTCHA protection, see the
+      <a href="https://docs.retellai.com/deploy/chat-widget" target="_blank" style="color:#5b4bd6;">full widget docs</a>.
+    </div>
+  </div>
+
+  <div class="footer">
+    Built by <a href="https://awesomate.com.au" target="_blank">Awesomate</a>
+  </div>
+
+  <script>
+    function copyCode(blockId) {
+      const block = document.getElementById(blockId);
+      const pre = block.querySelector('pre');
+      // Extract clean text (strip HTML tags)
+      const text = pre.textContent || pre.innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = block.querySelector('.copy-btn');
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy', 2000);
+      });
+    }
+  </script>
+</body>
+</html>
