@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Amplify Your Business — with the Power of AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --orange: #F3723A;
+      --green:  #79C142;
+      --green-h:#8ED954;
+      --navy:   #00254c;
+      --blue:   #0069B4;
+      --cyan:   #00B4DB;
+      --yellow: #EE9622;
+    }
+
+    body {
+      font-family: 'Barlow', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── TOP BANNER ── */
+    .top-banner {
+      background: var(--orange);
+      color: #fff;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 11px 20px;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: calc(100vh - 42px);
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      background-color: #dde1e6;
+      /* Layer 1: Dale photo (right-aligned), Layer 2: circuit grid background */
+      background-image:
+        url('https://businessblueprint.com/wp-content/uploads/2026/02/dalewbns.png'),
+        url('https://businessblueprint.com/wp-content/uploads/2026/02/AYB-graybg.png');
+      background-repeat: no-repeat, no-repeat;
+      background-size: auto 100%, cover;
+      background-position: right bottom, center;
+    }
+
+    /* subtle left-side content fade so text pops over circuit lines */
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(221,225,230,0.55) 0%, rgba(221,225,230,0.18) 52%, transparent 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .hero-inner {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 52px 48px 52px 64px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    /* BusinessBlueprint Presents */
+    .presents-row {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 14px;
+    }
+
+    .bb-logo {
+      height: 26px;
+      width: auto;
+      display: block;
+    }
+
+    .presents-text {
+      font-size: 15px;
+      font-weight: 400;
+      color: var(--navy);
+      font-style: italic;
+      line-height: 1;
+    }
+
+    /* AYB logo — "AMPLiFY YOUR BUSINESS" heading as SVG */
+    .ayb-logo {
+      display: block;
+      width: clamp(240px, 40vw, 500px);
+      height: auto;
+      margin-bottom: 10px;
+    }
+
+    /* WITH THE POWER OF AI */
+    .power-badge {
+      display: inline-block;
+      background: var(--navy);
+      color: #fff;
+      font-size: clamp(10px, 1.35vw, 15px);
+      font-weight: 700;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+      padding: 8px 18px 7px;
+      margin-bottom: 22px;
+    }
+
+    /* Punchline */
+    .punchline {
+      font-size: clamp(14px, 1.7vw, 19px);
+      line-height: 1.55;
+      color: var(--navy);
+      max-width: clamp(260px, 40vw, 500px);
+      margin-bottom: 28px;
+      font-weight: 400;
+    }
+
+    .punchline strong { font-weight: 800; }
+
+    /* CTA buttons */
+    .cta-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    .btn-ticket {
+      display: inline-block;
+      background: var(--green);
+      color: #fff;
+      text-decoration: none;
+      font-family: inherit;
+      font-size: clamp(12px, 1.35vw, 16px);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 14px 26px 13px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.18s ease;
+      line-height: 1;
+    }
+
+    .btn-ticket:hover { background: var(--green-h); }
+
+    .btn-talk {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: transparent;
+      color: var(--blue);
+      font-family: inherit;
+      font-size: clamp(12px, 1.35vw, 16px);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 12px 22px 11px;
+      border-radius: 5px;
+      border: 2.5px solid var(--blue);
+      cursor: pointer;
+      transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+      line-height: 1;
+    }
+
+    .btn-talk:hover:not(.connecting):not(.active) {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    .btn-talk.connecting {
+      opacity: 0.55;
+      cursor: wait;
+    }
+
+    .btn-talk.active {
+      background: #e54d37;
+      color: #fff;
+      border-color: #e54d37;
+    }
+
+    /* Media logos (Forbes, BI, GQ, BB) */
+    .media-logos {
+      display: block;
+      height: 30px;
+      width: auto;
+    }
+
+    /* BRAND NEW EVENT circular badge */
+    .brand-new-badge {
+      position: absolute;
+      right: clamp(10%, 27vw, 36%);
+      bottom: clamp(24px, 7%, 72px);
+      z-index: 3;
+      width: clamp(76px, 8vw, 118px);
+      height: clamp(76px, 8vw, 118px);
+      border-radius: 50%;
+      background: var(--yellow);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: clamp(9px, 0.95vw, 14px);
+      letter-spacing: 0.04em;
+      color: var(--navy);
+      text-align: center;
+      line-height: 1.25;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+      transform: rotate(-8deg);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      .hero {
+        background-image:
+          url('https://businessblueprint.com/wp-content/uploads/2026/02/mobile-dalewbn.png'),
+          url('https://businessblueprint.com/wp-content/uploads/2026/02/AYB-graybg.png');
+        background-size: 100% auto, cover;
+        background-position: center bottom, center;
+        align-items: flex-start;
+      }
+      .hero-inner { padding: 36px 24px 200px; }
+      .ayb-logo { width: min(300px, 82vw); }
+      .punchline { max-width: 92%; }
+      .brand-new-badge { right: 14px; bottom: 200px; }
+    }
+
+    @media (max-width: 480px) {
+      .cta-row { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .btn-ticket, .btn-talk { font-size: 13px; padding: 13px 22px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top orange banner -->
+  <header class="top-banner">FREE 1-DAY IN-PERSON WORKSHOP</header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-inner">
+
+      <!-- BusinessBlueprint Presents -->
+      <div class="presents-row">
+        <img
+          src="https://businessblueprint.com/wp-content/themes/BusinessBlueprint/images/bb-logo-navy.svg"
+          alt="BusinessBlueprint"
+          class="bb-logo"
+          onerror="this.style.display='none'; document.getElementById('bb-text').style.display='inline';"
+        />
+        <span id="bb-text" style="display:none; font-weight:800; font-size:15px; color:var(--navy);">BusinessBlueprint</span>
+        <span class="presents-text">Presents</span>
+      </div>
+
+      <!-- AMPLiFY YOUR BUSINESS logo -->
+      <img
+        src="https://businessblueprint.com/wp-content/themes/BusinessBlueprint/images/logo-ayb.svg"
+        alt="Amplify Your Business"
+        class="ayb-logo"
+      />
+
+      <!-- WITH THE POWER OF AI -->
+      <div class="power-badge">WITH THE <strong>POWER</strong> OF <strong>AI</strong></div>
+
+      <!-- Punchline -->
+      <p class="punchline">
+        In Just <strong>1-Day</strong>, Discover Exactly How To Build An Army of <strong>AI Agents</strong>
+        &amp; <strong>Automations</strong> That Can Generate Leads &amp; Make Sales Without You!
+      </p>
+
+      <!-- CTAs -->
+      <div class="cta-row">
+        <a href="https://businessblueprint.com/event/#booknow" class="btn-ticket">
+          CLAIM YOUR <strong>FREE</strong> TICKET
+        </a>
+        <button class="btn-talk" id="talkBtn">TALK TO AI 🤖</button>
+      </div>
+
+      <!-- Media logos -->
+      <img
+        src="https://businessblueprint.com/wp-content/uploads/2021/01/bc-media.png"
+        alt="As seen in Forbes, Business Insider, GQ and Business Builders"
+        class="media-logos"
+        onerror="this.style.display='none';"
+      />
+
+    </div>
+
+    <!-- BRAND NEW EVENT badge -->
+    <div class="brand-new-badge">
+      <span>BRAND</span>
+      <span>NEW</span>
+      <span>EVENT</span>
+    </div>
+  </section>
+
+  <script type="module">
+    const AGENT_ID    = 'agent_55e0f16cb91903f641cca032a7';
+    const WEBHOOK_URL = 'https://automations.vitalstats.app/webhook/retell-proxy';
+
+    const btn = document.getElementById('talkBtn');
+
+    // Preload SDK immediately so click feels instant
+    let RetellWebClient;
+    const sdkReady = import('https://esm.sh/retell-client-js-sdk@2.0.7').then(m => {
+      RetellWebClient = m.RetellWebClient;
+    });
+
+    let client = null;
+
+    btn.addEventListener('click', async () => {
+      if (btn.classList.contains('connecting')) return;
+
+      if (btn.classList.contains('active')) {
+        client?.stopCall();
+        return;
+      }
+
+      // idle → connecting
+      btn.classList.add('connecting');
+      btn.textContent = 'Connecting…';
+
+      try {
+        await sdkReady;
+
+        const res = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ agent_id: AGENT_ID }),
+        });
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const { access_token } = await res.json();
+
+        client = new RetellWebClient();
+
+        client.on('call_started', () => {
+          btn.classList.remove('connecting');
+          btn.classList.add('active');
+          btn.innerHTML = 'END CALL 🔴';
+        });
+
+        client.on('call_ended', () => {
+          btn.classList.remove('active', 'connecting');
+          btn.innerHTML = 'TALK TO AI 🤖';
+          client = null;
+        });
+
+        client.on('error', (err) => {
+          console.error('Retell error:', err);
+          btn.classList.remove('active', 'connecting');
+          btn.innerHTML = 'TALK TO AI 🤖';
+          client = null;
+        });
+
+        await client.startCall({ accessToken: access_token, sampleRate: 24000 });
+
+      } catch (err) {
+        console.error('Call failed:', err);
+        btn.classList.remove('connecting');
+        btn.innerHTML = 'TALK TO AI 🤖';
+        client = null;
+      }
+    });
+  </script>
+
+</body>
+</html>
