@@ -189,9 +189,76 @@
     }
 
     .btn-talk.active {
-      background: #e54d37;
+      background: var(--orange);
       color: #fff;
-      border-color: #e54d37;
+      border-color: var(--orange);
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 0 22px rgba(243,114,58,0.55);
+    }
+
+    /* ── FLARE WRAPPER (active call effect) ── */
+    .btn-talk-wrap {
+      position: relative;
+      display: inline-flex;
+      border-radius: 7px;
+    }
+
+    /* Spinning conic-gradient border using all brand colours */
+    .btn-talk-wrap::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 9px;
+      background: conic-gradient(
+        from 0deg,
+        #F3723A 0%,
+        #EE9622 14%,
+        #79C142 28%,
+        #00B4DB 43%,
+        #0069B4 57%,
+        #EE476F 71%,
+        #F3723A 100%
+      );
+      animation: spin-flare 1.6s linear infinite;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+      z-index: 0;
+    }
+
+    .btn-talk-wrap.active::before { opacity: 1; }
+
+    /* Expanding pulse rings — staggered colours from palette */
+    .flare-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 7px;
+      border: 2.5px solid transparent;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .btn-talk-wrap.active .flare-ring.r1 {
+      border-color: #F3723A;
+      animation: ring-expand 2s ease-out 0s infinite;
+    }
+    .btn-talk-wrap.active .flare-ring.r2 {
+      border-color: #00B4DB;
+      animation: ring-expand 2s ease-out 0.65s infinite;
+    }
+    .btn-talk-wrap.active .flare-ring.r3 {
+      border-color: #79C142;
+      animation: ring-expand 2s ease-out 1.3s infinite;
+    }
+
+    @keyframes spin-flare {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes ring-expand {
+      0%   { transform: scale(1);   opacity: 0.85; }
+      100% { transform: scale(2.8); opacity: 0;    }
     }
 
     /* Media logos (Forbes, BI, GQ, BB) */
@@ -291,7 +358,12 @@
         <a href="https://businessblueprint.com/event/#booknow" class="btn-ticket">
           CLAIM YOUR <strong>FREE</strong> TICKET
         </a>
-        <button class="btn-talk" id="talkBtn">TALK TO AI 🤖</button>
+        <div class="btn-talk-wrap" id="talkWrap">
+          <div class="flare-ring r1"></div>
+          <div class="flare-ring r2"></div>
+          <div class="flare-ring r3"></div>
+          <button class="btn-talk" id="talkBtn">TALK TO AI 🤖</button>
+        </div>
       </div>
 
       <!-- Media logos -->
@@ -316,7 +388,8 @@
     const AGENT_ID    = 'agent_55e0f16cb91903f641cca032a7';
     const WEBHOOK_URL = 'https://automations.vitalstats.app/webhook/retell-proxy';
 
-    const btn = document.getElementById('talkBtn');
+    const btn  = document.getElementById('talkBtn');
+    const wrap = document.getElementById('talkWrap');
 
     // Preload SDK immediately so click feels instant
     let RetellWebClient;
@@ -355,11 +428,13 @@
         client.on('call_started', () => {
           btn.classList.remove('connecting');
           btn.classList.add('active');
-          btn.innerHTML = 'END CALL 🔴';
+          wrap.classList.add('active');
+          btn.innerHTML = 'END CALL ✕';
         });
 
         client.on('call_ended', () => {
           btn.classList.remove('active', 'connecting');
+          wrap.classList.remove('active');
           btn.innerHTML = 'TALK TO AI 🤖';
           client = null;
         });
@@ -367,6 +442,7 @@
         client.on('error', (err) => {
           console.error('Retell error:', err);
           btn.classList.remove('active', 'connecting');
+          wrap.classList.remove('active');
           btn.innerHTML = 'TALK TO AI 🤖';
           client = null;
         });
@@ -375,7 +451,8 @@
 
       } catch (err) {
         console.error('Call failed:', err);
-        btn.classList.remove('connecting');
+        btn.classList.remove('connecting', 'active');
+        wrap.classList.remove('active');
         btn.innerHTML = 'TALK TO AI 🤖';
         client = null;
       }
