@@ -206,31 +206,6 @@
       border-radius: 7px;
     }
 
-    /* Spinning conic-gradient border using all brand colours */
-    .btn-talk-wrap::before {
-      content: '';
-      position: absolute;
-      inset: -4px;
-      border-radius: 9px;
-      background: conic-gradient(
-        from 0deg,
-        #F3723A 0%,
-        #EE9622 14%,
-        #79C142 28%,
-        #00B4DB 43%,
-        #0069B4 57%,
-        #EE476F 71%,
-        #F3723A 100%
-      );
-      animation: spin-flare 1.6s linear infinite;
-      opacity: 0;
-      transition: opacity 0.35s ease;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    .btn-talk-wrap.active::before { opacity: 1; }
-
     /* Expanding pulse rings — staggered colours from palette */
     .flare-ring {
       position: absolute;
@@ -253,10 +228,6 @@
     .btn-talk-wrap.active .flare-ring.r3 {
       border-color: #79C142;
       animation: ring-expand 2s ease-out 1.3s infinite;
-    }
-
-    @keyframes spin-flare {
-      to { transform: rotate(360deg); }
     }
 
     @keyframes ring-expand {
