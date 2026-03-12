@@ -1,0 +1,161 @@
+<!-- ============================================================
+     BLUEBERRY AI BUTTON — drop-in snippet for businessblueprint.com
+     Place this block wherever you want the "TALK TO AI" button.
+     No dependencies. Works alongside existing page styles.
+     ============================================================ -->
+
+<style>
+  /* Scoped with .bb-ai- prefix — won't clash with existing site CSS */
+  .bb-ai-wrap {
+    position: relative;
+    display: inline-flex;
+    border-radius: 5px;
+    vertical-align: middle;
+  }
+
+  /* Expanding ripple rings (brand colours) — only visible when active */
+  .bb-ai-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 5px;
+    border: 2.5px solid transparent;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .bb-ai-wrap.active .bb-ai-ring.r1 {
+    border-color: #F3723A;
+    animation: bb-ai-ripple 2s ease-out 0s infinite;
+  }
+  .bb-ai-wrap.active .bb-ai-ring.r2 {
+    border-color: #00B4DB;
+    animation: bb-ai-ripple 2s ease-out 0.65s infinite;
+  }
+  .bb-ai-wrap.active .bb-ai-ring.r3 {
+    border-color: #79C142;
+    animation: bb-ai-ripple 2s ease-out 1.3s infinite;
+  }
+  @keyframes bb-ai-ripple {
+    0%   { transform: scale(1);   opacity: 0.85; }
+    100% { transform: scale(2.8); opacity: 0;    }
+  }
+
+  /* The button itself */
+  .bb-ai-btn {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: transparent;
+    color: #0069B4;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 12px 22px 11px;
+    border-radius: 5px;
+    border: 2.5px solid #0069B4;
+    cursor: pointer;
+    transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .bb-ai-btn:hover:not(.bb-ai-connecting):not(.bb-ai-active) {
+    background: #0069B4;
+    color: #fff;
+  }
+  .bb-ai-btn.bb-ai-connecting {
+    opacity: 0.55;
+    cursor: wait;
+  }
+  .bb-ai-btn.bb-ai-active {
+    background: #F3723A;
+    color: #fff;
+    border-color: #F3723A;
+    box-shadow: 0 0 22px rgba(243,114,58,0.45);
+  }
+</style>
+
+<div class="bb-ai-wrap" id="bbAiWrap">
+  <div class="bb-ai-ring r1"></div>
+  <div class="bb-ai-ring r2"></div>
+  <div class="bb-ai-ring r3"></div>
+  <button class="bb-ai-btn" id="bbAiBtn">TALK TO AI 🤖</button>
+</div>
+
+<script type="module">
+  const AGENT_ID    = 'agent_55e0f16cb91903f641cca032a7';
+  const WEBHOOK_URL = 'https://automations.vitalstats.app/webhook/retell-proxy';
+
+  const btn  = document.getElementById('bbAiBtn');
+  const wrap = document.getElementById('bbAiWrap');
+
+  // Pre-load SDK in background so first click feels instant
+  let RetellWebClient;
+  const sdkReady = import('https://esm.sh/retell-client-js-sdk@2.0.7')
+    .then(m => { RetellWebClient = m.RetellWebClient; });
+
+  let client = null;
+
+  btn.addEventListener('click', async () => {
+    if (btn.classList.contains('bb-ai-connecting')) return;
+
+    if (btn.classList.contains('bb-ai-active')) {
+      client?.stopCall();
+      return;
+    }
+
+    // idle → connecting
+    btn.classList.add('bb-ai-connecting');
+    btn.textContent = 'Connecting…';
+
+    try {
+      await sdkReady;
+
+      const res = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ agent_id: AGENT_ID }),
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const { access_token } = await res.json();
+
+      client = new RetellWebClient();
+
+      client.on('call_started', () => {
+        btn.classList.remove('bb-ai-connecting');
+        btn.classList.add('bb-ai-active');
+        wrap.classList.add('active');
+        btn.innerHTML = 'END CALL ✕';
+      });
+
+      client.on('call_ended', () => {
+        btn.classList.remove('bb-ai-active', 'bb-ai-connecting');
+        wrap.classList.remove('active');
+        btn.innerHTML = 'TALK TO AI 🤖';
+        client = null;
+      });
+
+      client.on('error', (err) => {
+        console.error('Retell error:', err);
+        btn.classList.remove('bb-ai-active', 'bb-ai-connecting');
+        wrap.classList.remove('active');
+        btn.innerHTML = 'TALK TO AI 🤖';
+        client = null;
+      });
+
+      await client.startCall({ accessToken: access_token, sampleRate: 24000 });
+
+    } catch (err) {
+      console.error('Blueberry call failed:', err);
+      btn.classList.remove('bb-ai-connecting', 'bb-ai-active');
+      wrap.classList.remove('active');
+      btn.innerHTML = 'TALK TO AI 🤖';
+      client = null;
+    }
+  });
+</script>
+
+<!-- END BLUEBERRY AI BUTTON -->
