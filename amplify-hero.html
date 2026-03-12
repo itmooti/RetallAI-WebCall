@@ -163,6 +163,8 @@
       display: inline-flex;
       align-items: center;
       gap: 7px;
+      position: relative;
+      z-index: 1;
       background: transparent;
       color: var(--blue);
       font-family: inherit;
@@ -224,6 +226,7 @@
       opacity: 0;
       transition: opacity 0.35s ease;
       z-index: 0;
+      pointer-events: none;
     }
 
     .btn-talk-wrap.active::before { opacity: 1; }
