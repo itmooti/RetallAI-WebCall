@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chat with Blueberry — Amplify Your Business</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #021B35;
+      --blue:   #0069B4;
+      --cyan:   #00B4DB;
+      --green:  #7CC649;
+      --orange: #E8752F;
+      --pink:   #EE476F;
+      --white:  #ffffff;
+      --bg:     #f5f8fb;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--navy);
+      overflow: hidden;
+    }
+
+    /* Subtle background texture using palette */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 20% 0%, rgba(0,180,219,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 60% at 80% 100%, rgba(0,105,180,0.10) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 90% 10%, rgba(238,71,111,0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 56px;
+      padding: 40px 20px;
+    }
+
+    /* Logo */
+    .logo {
+      width: 180px;
+      height: auto;
+      display: block;
+      flex-shrink: 0;
+    }
+
+    /* Button wrapper — holds the rings + button */
+    .btn-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 240px;
+      height: 240px;
+      flex-shrink: 0;
+    }
+
+    /* Pulse rings */
+    .ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 3px solid var(--cyan);
+      opacity: 0;
+      transform: scale(1);
+      pointer-events: none;
+    }
+
+    /* Idle state — slow heartbeat rings */
+    [data-state="idle"] .ring-1 {
+      animation: pulse 2.8s ease-out infinite;
+    }
+    [data-state="idle"] .ring-2 {
+      animation: pulse 2.8s ease-out 0.9s infinite;
+    }
+    [data-state="idle"] .ring-3 {
+      animation: pulse 2.8s ease-out 1.8s infinite;
+    }
+
+    /* Active state — faster green rings */
+    [data-state="active"] .ring-1 {
+      border-color: var(--green);
+      animation: pulse 1.4s ease-out infinite;
+    }
+    [data-state="active"] .ring-2 {
+      border-color: var(--green);
+      animation: pulse 1.4s ease-out 0.45s infinite;
+    }
+    [data-state="active"] .ring-3 {
+      border-color: var(--green);
+      animation: pulse 1.4s ease-out 0.9s infinite;
+    }
+
+    @keyframes pulse {
+      0%   { opacity: 0.7; transform: scale(1); }
+      100% { opacity: 0;   transform: scale(1.9); }
+    }
+
+    /* The circular button itself */
+    .btn {
+      position: relative;
+      z-index: 2;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: transform 0.2s ease, box-shadow 0.4s ease, background 0.4s ease;
+      background: linear-gradient(135deg, var(--blue) 0%, var(--cyan) 100%);
+      box-shadow:
+        0 8px 40px rgba(0, 105, 180, 0.45),
+        0 2px 8px rgba(0, 0, 0, 0.12),
+        inset 0 1px 0 rgba(255,255,255,0.2);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn:hover:not([data-state="connecting"]) {
+      transform: scale(1.04);
+      box-shadow:
+        0 12px 50px rgba(0, 105, 180, 0.55),
+        0 4px 12px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+
+    .btn:active:not([data-state="connecting"]) {
+      transform: scale(0.97);
+    }
+
+    /* Active state — green */
+    [data-state="active"] .btn {
+      background: linear-gradient(135deg, #5aaa2f 0%, var(--green) 100%);
+      box-shadow:
+        0 8px 40px rgba(124, 198, 73, 0.5),
+        0 2px 8px rgba(0, 0, 0, 0.12),
+        inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+
+    [data-state="active"] .btn:hover {
+      box-shadow:
+        0 12px 50px rgba(124, 198, 73, 0.6),
+        0 4px 12px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+
+    /* Connecting state — muted */
+    [data-state="connecting"] .btn {
+      background: linear-gradient(135deg, #7baec8 0%, #93cce0 100%);
+      box-shadow: 0 8px 30px rgba(0, 105, 180, 0.25);
+      cursor: wait;
+    }
+
+    /* Button text */
+    .btn-label {
+      font-size: 17px;
+      font-weight: 700;
+      color: #ffffff;
+      text-align: center;
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+      pointer-events: none;
+    }
+
+    .btn-sub {
+      font-size: 12px;
+      font-weight: 400;
+      color: rgba(255, 255, 255, 0.8);
+      text-align: center;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+
+    /* Spinner for connecting state */
+    .spinner {
+      display: none;
+      width: 28px;
+      height: 28px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+
+    [data-state="connecting"] .spinner { display: block; }
+    [data-state="connecting"] .btn-label { display: none; }
+    [data-state="connecting"] .btn-sub { display: none; }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Live indicator dot */
+    .live-dot {
+      display: none;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.9);
+      animation: blink 1.2s ease-in-out infinite;
+      position: absolute;
+      bottom: 44px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    [data-state="active"] .live-dot { display: block; }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .logo { width: 140px; }
+      .btn  { width: 170px; height: 170px; }
+      .btn-wrap { width: 200px; height: 200px; }
+      .btn-label { font-size: 15px; }
+      .page { gap: 44px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <img
+      class="logo"
+      src="https://businessblueprint.com/wp-content/themes/BusinessBlueprint/images/logo-ayb.svg"
+      alt="Amplify Your Business"
+      onerror="this.style.display='none'; document.getElementById('logo-fallback').style.display='block';"
+    />
+    <div id="logo-fallback" style="display:none; font-size:22px; font-weight:700; color:var(--navy); letter-spacing:-0.02em;">Amplify Your Business</div>
+
+    <div class="btn-wrap" data-state="idle" id="wrap">
+      <div class="ring ring-1"></div>
+      <div class="ring ring-2"></div>
+      <div class="ring ring-3"></div>
+
+      <button class="btn" id="callBtn" aria-label="Chat with Blueberry">
+        <div class="spinner"></div>
+        <span class="btn-label">Chat with<br>Blueberry</span>
+        <span class="btn-sub" id="btnSub"></span>
+        <div class="live-dot"></div>
+      </button>
+    </div>
+  </div>
+
+  <script type="module">
+    const AGENT_ID   = 'agent_55e0f16cb91903f641cca032a7';
+    const WEBHOOK_URL = 'https://automations.vitalstats.app/webhook/retell-proxy';
+
+    const wrap   = document.getElementById('wrap');
+    const btn    = document.getElementById('callBtn');
+    const btnSub = document.getElementById('btnSub');
+
+    // State: idle | connecting | active
+    function setState(s, subText = '') {
+      wrap.dataset.state = s;
+      btnSub.textContent = subText;
+    }
+
+    // Load SDK
+    let RetellWebClient;
+    const sdkReady = import('https://esm.sh/retell-client-js-sdk@2.0.7').then(m => {
+      RetellWebClient = m.RetellWebClient;
+    });
+
+    let client = null;
+
+    btn.addEventListener('click', async () => {
+      const state = wrap.dataset.state;
+
+      if (state === 'connecting') return;
+
+      if (state === 'active') {
+        client?.stopCall();
+        return;
+      }
+
+      // idle → connecting
+      setState('connecting');
+
+      try {
+        await sdkReady;
+
+        const res = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ agent_id: AGENT_ID }),
+        });
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const { access_token } = await res.json();
+
+        client = new RetellWebClient();
+
+        client.on('call_started',        () => setState('active', 'Tap to end'));
+        client.on('call_ended',          () => { setState('idle'); client = null; });
+        client.on('agent_start_talking', () => {});
+        client.on('agent_stop_talking',  () => {});
+        client.on('error',               (e) => { console.error('Retell error', e); setState('idle'); client = null; });
+
+        await client.startCall({ accessToken: access_token, sampleRate: 24000 });
+
+      } catch (err) {
+        console.error('Call failed:', err);
+        setState('idle');
+        client = null;
+      }
+    });
+  </script>
+</body>
+</html>
